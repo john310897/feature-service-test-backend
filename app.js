@@ -23,11 +23,13 @@ app.post('/api/uploadMessage', upload.single('audio'), async (req, res) => {
         const collection = database.collection(COLLECTION_NAME);
         const patientId = req.body.patientId;
         const newAudio = {
-            data: req.file.buffer,
-            contentType: req.file.mimetype,
-            date: req.body.date,
-            time: req.body.time,
-            patientId: req.body.patientId
+            data: req?.file?.buffer,
+            contentType: req?.file?.mimetype,
+            date: req?.body?.date,
+            time: req?.body?.time,
+            patientId: req?.body?.patientId,
+            text: req?.body?.text,
+            mode: req?.body?.mode
         };
         await collection.insertOne(newAudio);
         const findResult = await collection.find({ patientId }).toArray();
@@ -35,8 +37,6 @@ app.post('/api/uploadMessage', upload.single('audio'), async (req, res) => {
     } finally {
         await client.close();
     }
-
-    res.json({ time: currentTime });
 });
 
 app.get('/api/data', async (req, res) => {
@@ -60,6 +60,7 @@ app.get('/api/data/patients', async (req, res) => {
     const collection = database.collection('patients');
     const findResult = await collection.find({}).toArray();
     return res.json(findResult);
+
 });
 
 app.listen(BACKEND_PORT, () => {
